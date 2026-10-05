@@ -1,9 +1,9 @@
 package com.api.carteira.digital.usuario.service;
 
+import com.api.carteira.digital.core.exception.RecursoNaoEncontradoException;
 import com.api.carteira.digital.usuario.dto.UsuarioPatchRequest;
 import com.api.carteira.digital.usuario.dto.UsuarioRequest;
 import com.api.carteira.digital.usuario.dto.UsuarioResponse;
-import com.api.carteira.digital.core.exception.RecursoNaoEncontradoException;
 import com.api.carteira.digital.usuario.mapper.UsuarioMapper;
 import com.api.carteira.digital.usuario.model.Usuario;
 import com.api.carteira.digital.usuario.repository.UsuarioRepository;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,6 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
     private final BCryptPasswordEncoder passwordEncoder;
-//    private final UsuarioMapperMapperStruct usuarioMapper;
 
     @Transactional
     public UsuarioResponse salvarUsuario(UsuarioRequest usuarioRequest) {
@@ -49,7 +49,7 @@ public class UsuarioService {
         return usuarioMapper.toListDTO(usuariosSalvos);
     }
 
-    public Usuario buscarUsuarioPorId(Long id) {
+    public Usuario buscarUsuarioPorId(UUID id) {
         return usuarioRepository.findByIdAndExcluidoFalse(id).orElseThrow(
                 () -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + id));
     }
@@ -57,42 +57,30 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public Page<UsuarioResponse> buscarUsuariosPaginados(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Usuario> usuariosPage = usuarioRepository.findAllByExcluidoFalse(pageable); //Usando soft
+        Page<Usuario> usuariosPage = usuarioRepository.findAllByExcluidoFalse(pageable);
         return usuariosPage.map(usuarioMapper::toResponse);
     }
 
-    //    Deve retornar todos os usuarios apenas onde o campo excluído for false, ou seja, não excluídos
     @Transactional(readOnly = true)
     public List<UsuarioResponse> findAllByExcluidoFalse() {
         List<Usuario> allAndExcluidoFalse = usuarioRepository.findAllByExcluidoFalse();
         return usuarioMapper.toListDTO(allAndExcluidoFalse);
     }
 
-    //    Deve retornar usuario por id onde o campo excluído for false, ou seja, não excluído
     @Transactional(readOnly = true)
-    public UsuarioResponse buscarPorIdOndeExcluidoForFalse(Long id) {
+    public UsuarioResponse buscarPorIdOndeExcluidoForFalse(UUID id) {
         Usuario usuario = buscarUsuarioPorId(id);
         return usuarioMapper.toResponse(usuario);
     }
 
-    /*
-       Anotação @Transactional ativa o Entity Manager/Persistence Context que o Hibernate ao buscar por Id joga a entidade nesse contexto,
-       cria um snapshot do estado que veio do banco e trata a entidade como managed,
-       dessa forma o hibernate faz o dirty checking verificando alguma alteração comparando o objeto em memória com o snapshot
-       e salvando as alterações no banco sem precisar chamar o .save()
-    */
     @Transactional
-    public void softDelete(Long id) {
+    public void softDelete(UUID id) {
         Usuario usuario = buscarUsuarioPorId(id);
         usuario.setExcluido(true);
     }
 
-    /*
-       @Transactional
-       Diz que cada operação com o banco pertence a uma única unidade de trabalho, começa junto e termina junto
-    */
     @Transactional
-    public UsuarioResponse atualizarUsuario(Long id, UsuarioPatchRequest request) {
+    public UsuarioResponse atualizarUsuario(UUID id, UsuarioPatchRequest request) {
         Usuario usuario = buscarUsuarioPorId(id);
         Usuario usuarioAtualizado = usuarioMapper.toEntity(request, usuario);
 

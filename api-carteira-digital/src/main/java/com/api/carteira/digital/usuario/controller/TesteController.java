@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "/teste")
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class TesteController {
             description = "Endpoint para buscar um usuário pelo seu ID"
     )
     @GetMapping
-    public ResponseEntity<Usuario> getUsuarioEntidade(@RequestParam("id") Long id) {
+    public ResponseEntity<Usuario> getUsuarioEntidade(@RequestParam("id") UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + id)));
     }
@@ -36,7 +38,7 @@ public class TesteController {
     )
     @PostMapping
     public ResponseEntity<Usuario> salvarUsuario(@RequestBody Usuario usuario) {
-        usuario.getCarteiras().getFirst().setUsuario(usuario);
+        usuario.getCarteira().setUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRepository.save(usuario));
     }
 

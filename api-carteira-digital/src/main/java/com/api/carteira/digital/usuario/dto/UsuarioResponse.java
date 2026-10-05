@@ -3,9 +3,10 @@ package com.api.carteira.digital.usuario.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record UsuarioResponse(
-        Long id,
+        UUID id,
         String nome,
         String email,
         String telefone,

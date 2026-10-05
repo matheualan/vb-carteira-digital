@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class UsuarioMapper {
@@ -52,7 +53,7 @@ public class UsuarioMapper {
     }
 
     public UsuarioResponse toResponse(Usuario usuario) {
-        Long id = usuario.getId();
+        UUID id = usuario.getId();
         String nome = usuario.getNome();
         String email = usuario.getEmail();
         String telefone = usuario.getTelefone();

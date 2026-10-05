@@ -11,7 +11,6 @@ public class CarteiraMapper {
     public Carteira toEntity(CarteiraRequest dtoRequest) {
         return new Carteira(
                 dtoRequest.nome(),
-                dtoRequest.descricao(),
                 dtoRequest.saldo()
         );
     }
@@ -19,7 +18,6 @@ public class CarteiraMapper {
     public CarteiraResponse toResponse(Carteira entity) {
         return new CarteiraResponse(
                 entity.getNome(),
-                entity.getDescricao(),
                 entity.getSaldo()
         );
     }

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 public record CarteiraResponse(
         String nome,
-        String descricao,
         BigDecimal saldo
 ) {
 }

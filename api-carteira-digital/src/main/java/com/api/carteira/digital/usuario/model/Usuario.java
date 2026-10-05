@@ -7,12 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "usuarios")
@@ -20,12 +22,13 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@JsonIgnoreProperties({ "id", "excluido", "dataCriacao", "dataAtualizacao" }) //Anotação sendo usada para testes
+@JsonIgnoreProperties({ "id", "excluido", "dataCriacao", "dataAtualizacao" })
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //Verificar por que é melhor usar IDENTITY do que AUTO no PostgreSQL
-    private Long id;
+    @GeneratedValue
+    @UuidGenerator
+    private UUID id;
 
     @Column(nullable = false, length = 150)
     private String nome;
@@ -48,30 +51,14 @@ public class Usuario {
     @Column(nullable = false, insertable = false) //estava ficando null quando ia salvar usuario junto com carteira, por isso colocado insertable = false
     private Boolean excluido = false;
 
-//  Essa abordagem de insertable e updatable é para não precisar passar o valor desse campo e deixar o banco de dados gerar por meio do default current_timestamp
     @Column(nullable = false, insertable = false, updatable = false) //insertable false = Hibernate omite o campo no insert / updatable false = nao inclui o campo em updates
-//  @CreationTimestamp Poderia ser uma solução onde o Hibernate geraria o valor e mandaria pro insert.
-//  Resolve a problema de ler o valor de volta após o save(). pois com o banco gerando se der um getDataCriacao() em seguida retorna null até um novo find
     private LocalDateTime dataCriacao; //Quem gera é o banco na hora do insert
 
     @Column
-    private LocalDateTime dataAtualizacao; //Se eu quiser salvar todas as datas que foi atualizado, como faço?
+    private LocalDateTime dataAtualizacao;
 
-//    mappedBy = "usuario" indica que o relacionamento é bidirecional e que a entidade Carteira é a dona do relacionamento.
-//    cascade = CascadeType.ALL indica que todas as operações (persist, merge, remove, refresh, detach) serão propagadas para a entidade Carteira.
-//    orphanRemoval = true indica que se a entidade Usuario for removida, a entidade Carteira associada também será removida.
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Carteira> carteiras = new ArrayList<>();
-
-    // Verificar se esses dois métodos são realmente necessários
-    public void adicionarCarteira(Carteira carteira) {
-        carteiras.add(carteira);
-        carteira.setUsuario(this);
-    }
-    public void removerCarteira(Carteira carteira) {
-        carteiras.remove(carteira);
-        carteira.setUsuario(null);
-    }
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Carteira carteira;
 
     public int calcularIdade(LocalDate dataNascimento) {
         return Period.between(dataNascimento, LocalDate.now()).getYears();

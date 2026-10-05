@@ -22,7 +22,6 @@ import java.util.List;
 public interface UsuarioMapperMapperStruct {
 
     Usuario toEntity(UsuarioRequest dto);
-    Usuario toEntity(UsuarioResponse dto);
 
     UsuarioResponse toResponse(Usuario usuario);
 

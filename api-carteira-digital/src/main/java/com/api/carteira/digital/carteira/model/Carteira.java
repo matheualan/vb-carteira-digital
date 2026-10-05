@@ -1,5 +1,6 @@
 package com.api.carteira.digital.carteira.model;
 
+import com.api.carteira.digital.transacao.model.Transacao;
 import com.api.carteira.digital.usuario.model.Usuario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -10,6 +11,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,20 +28,27 @@ public class Carteira {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false, length = 50)
     private String nome;
-    private String descricao;
+
+    @Column(nullable = false, precision = 19, scale = 2) // precision = 19, scale = 2 define a precisão e escala do campo no banco de dados
     private BigDecimal saldo;
 
     @Column(nullable = false) // insertable = false, updatable = false
     private LocalDateTime dataCriacao; // = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", referencedColumnName = "id") //, nullable = false
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true) //, nullable = false
     private Usuario usuario;
 
-    public Carteira(String nome, String descricao, BigDecimal saldo) {
+    @OneToMany(mappedBy = "carteiraOrigem", fetch = FetchType.LAZY)
+    private List<Transacao> origemTransacao = new ArrayList<>();
+
+    @OneToMany(mappedBy = "carteiraOrigem", fetch = FetchType.LAZY)
+    private List<Transacao> destinoTransacao = new ArrayList<>();
+
+    public Carteira(String nome, BigDecimal saldo) {
         this.nome = nome;
-        this.descricao = descricao;
         this.saldo = saldo;
     }
 

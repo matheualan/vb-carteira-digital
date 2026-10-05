@@ -16,11 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/usuarios")
 @RequiredArgsConstructor
-@Tag(name = "Usuarios", description = "API para gerenciamento de usuários") //Define o titulo swagger dos endpoints controller
+@Tag(name = "Usuarios", description = "API para gerenciamento de usuários")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -80,7 +81,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping()
-    public ResponseEntity<Void> softDelete(@RequestParam(value = "id") Long id) {
+    public ResponseEntity<Void> softDelete(@RequestParam(value = "id") UUID id) {
         usuarioService.softDelete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -96,7 +97,7 @@ public class UsuarioController {
     })
     @GetMapping("/{id}")
 //    public ResponseEntity<UsuarioResponse> softFindById(@RequestParam(value = "id") Long id) {
-    public ResponseEntity<UsuarioResponse> softFindById(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponse> softFindById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.buscarPorIdOndeExcluidoForFalse(id));
     }
 
@@ -124,7 +125,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PatchMapping()
-    public ResponseEntity<UsuarioResponse> atualizarUsuario(@RequestParam(value = "id") Long id,
+    public ResponseEntity<UsuarioResponse> atualizarUsuario(@RequestParam(value = "id") UUID id,
                                                             @RequestBody @Valid UsuarioPatchRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.atualizarUsuario(id, request));
     }

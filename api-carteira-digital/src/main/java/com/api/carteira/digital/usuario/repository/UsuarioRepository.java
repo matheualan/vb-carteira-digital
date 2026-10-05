@@ -9,15 +9,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
 //    derived querys
 
 //  Exemplo de como seria a query JPQL
 //  @Query("SELECT u FROM Usuario u WHERE u.id = :id AND u.excluido = false")
-    Optional<Usuario> findByIdAndExcluidoFalse(Long id);
+    Optional<Usuario> findByIdAndExcluidoFalse(UUID id);
 
 //  Exemplo de como seria a query JPQL
 //  @Query("SELECT u FROM Usuarios u WHERE u.excluido = false")
