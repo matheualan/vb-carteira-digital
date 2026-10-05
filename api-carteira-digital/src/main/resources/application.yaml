@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: api-carteira-digital
+  profiles:
+    active: dev
+
+# Configuração para criar pasta de logs e armazenar logs em arquivo
+#logging:
+#  file:
+#    name: logs/api-carteira-digital.log
+#  level:
+#    com.api.carteira.digital: INFO
