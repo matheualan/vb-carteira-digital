@@ -28,6 +28,10 @@ public class Transacao {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal valor;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private TipoTransacao tipoTransacao;
+
     @ManyToOne
     @JoinColumn(name = "carteira_origem_id")
     private Carteira carteiraOrigem;

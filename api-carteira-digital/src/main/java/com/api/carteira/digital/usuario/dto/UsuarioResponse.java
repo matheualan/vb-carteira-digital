@@ -11,7 +11,6 @@ public record UsuarioResponse(
         String email,
         String telefone,
         String cpf,
-//        String senha,
         @JsonFormat(pattern = "dd/MM/yyyy")
         LocalDate dataNascimento
 ) {

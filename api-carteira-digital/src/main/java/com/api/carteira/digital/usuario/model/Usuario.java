@@ -28,6 +28,7 @@ public class Usuario {
     @Id
     @GeneratedValue
     @UuidGenerator
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false, length = 150)

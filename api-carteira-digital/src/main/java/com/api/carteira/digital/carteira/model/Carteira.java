@@ -21,7 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@JsonIgnoreProperties({ "id",  "usuario" })
+@JsonIgnoreProperties({"id", "usuario"})
 public class Carteira {
 
     @Id
@@ -31,20 +31,22 @@ public class Carteira {
     @Column(nullable = false, length = 50)
     private String nome;
 
-    @Column(nullable = false, precision = 19, scale = 2) // precision = 19, scale = 2 define a precisão e escala do campo no banco de dados
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal saldo;
 
     @Column(nullable = false) // insertable = false, updatable = false
     private LocalDateTime dataCriacao; // = LocalDateTime.now();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY) //Verificar se precisa ter o FetchType.LAZY em @OneToOne
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true) //, nullable = false
     private Usuario usuario;
 
+    //    Para ter um atalho para poder buscar todas as transações onde teve essa carteira como origem
     @OneToMany(mappedBy = "carteiraOrigem", fetch = FetchType.LAZY)
     private List<Transacao> origemTransacao = new ArrayList<>();
 
-    @OneToMany(mappedBy = "carteiraOrigem", fetch = FetchType.LAZY)
+    //    Para ter um atalho para poder buscar todas as transações onde teve essa carteira como destino
+    @OneToMany(mappedBy = "carteiraDestino", fetch = FetchType.LAZY)
     private List<Transacao> destinoTransacao = new ArrayList<>();
 
     public Carteira(String nome, BigDecimal saldo) {

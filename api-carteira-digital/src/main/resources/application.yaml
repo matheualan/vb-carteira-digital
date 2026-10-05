@@ -2,7 +2,7 @@ spring:
   application:
     name: api-carteira-digital
   profiles:
-    active: dev
+    active: prod
 
 # Configuração para criar pasta de logs e armazenar logs em arquivo
 #logging:
