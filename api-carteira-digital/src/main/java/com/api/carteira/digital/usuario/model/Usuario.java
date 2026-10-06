@@ -26,7 +26,6 @@ import java.util.UUID;
 public class Usuario {
 
     @Id
-    @GeneratedValue
     @UuidGenerator
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
@@ -49,10 +48,10 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDate dataNascimento;
 
-    @Column(nullable = false, insertable = false) //estava ficando null quando ia salvar usuario junto com carteira, por isso colocado insertable = false
+    @Column(nullable = false) //, insertable = false) //estava ficando null quando ia salvar usuario junto com carteira, por isso colocado insertable = false
     private Boolean excluido = false;
 
-    @Column(nullable = false, insertable = false, updatable = false) //insertable false = Hibernate omite o campo no insert / updatable false = nao inclui o campo em updates
+    @Column(nullable = false, updatable = false) //insertable false = Hibernate omite o campo no insert / updatable false = nao inclui o campo em updates
     private LocalDateTime dataCriacao; //Quem gera é o banco na hora do insert
 
     @Column
@@ -68,6 +67,17 @@ public class Usuario {
     public String retornarIdade() {
         int idade = calcularIdade(this.dataNascimento);
         return String.format("%d anos", idade);
+    }
+
+    @PrePersist
+    private void prePersist() {
+        this.dataCriacao = LocalDateTime.now();
+        this.excluido = false;
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        this.dataAtualizacao = LocalDateTime.now();
     }
 
 }

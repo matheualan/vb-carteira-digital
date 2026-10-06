@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -74,6 +77,18 @@ public class RestHandlerException {
                         .mensagemDev(e.getClass().getName())
                         .timestamp(LocalDateTime.now())
                         .build());
+    }
+
+//    Tratamento de exceção para casos de concorrência otimista, onde duas transações tentam atualizar o mesmo registro ao mesmo tempo.
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Conflito de Concorrência");
+        body.put("message", "O registro foi alterado por outro processo. Por favor, recarregue a página e tente novamente.");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body); // HTTP 409 Conflict
     }
 
 }
