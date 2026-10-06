@@ -21,7 +21,6 @@ import java.util.UUID;
 public class Transacao {
 
     @Id
-    @GeneratedValue
     @UuidGenerator
     private UUID id;
 
@@ -29,19 +28,26 @@ public class Transacao {
     private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private TipoTransacao tipoTransacao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carteira_origem_id")
     private Carteira carteiraOrigem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carteira_destino_id")
     private Carteira carteiraDestino;
 
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
+
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private StatusTransacao statusTransacao;
+
+//    @Version
+//    private Long versao;
 
     @PrePersist
     private void prePersist() {
