@@ -1,0 +1,125 @@
+name: api-carteira-digital
+
+services:
+  # ---------------- APLICAÇÃO (Spring Boot) ----------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: api-carteira-digital:1.0.0
+    container_name: api_carteira-digital
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db_pagamentos
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      TZ: America/Sao_Paulo
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 45s
+      retries: 3
+    networks:
+      - carteira-digital-net
+
+  # ---------------- BANCO DE DADOS ----------------
+  db:
+    image: postgres:16-alpine
+    container_name: db_carteira-digital
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: db_pagamentos
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d db_pagamentos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - carteira-digital-net
+
+volumes:
+  pgdata:
+
+networks:
+  carteira-digital-net:
+    driver: bridge
+
+
+
+## ============================================================
+## docker-compose.yml — API Carteira Digital + PostgreSQL
+## ============================================================
+#name: api-carteira-digital
+#
+#services:
+#  # ---------------- APLICAÇÃO (Spring Boot) ----------------
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    image: api-carteira-digital:1.0.0
+#    container_name: api_carteira-digital
+#    restart: unless-stopped
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      # O nome do host "db" resolve pela rede interna do compose
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db_pagamentos
+#      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+#      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+#      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+#      TZ: America/Sao_Paulo
+#    # Só sobe a API depois que o Postgres estiver pronto de verdade
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#    healthcheck:
+#      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+#      interval: 30s
+#      timeout: 5s
+#      start_period: 45s
+#      retries: 3
+#    networks:
+#      - carteira-digital-net
+#
+#  # ---------------- BANCO DE DADOS ----------------
+#  db:
+#    image: postgres:16-alpine
+#    container_name: db_carteira-digital
+#    restart: unless-stopped
+#    environment:
+##      POSTGRES_DB: db_pagamentos
+#      DB_URL: jdbc:postgresql://db:5432/db_pagamentos
+#      DB_USERNAME: ${DB_USERNAME}
+#      DB_PASSWORD: ${DB_PASSWORD}
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data # Os dados sobrevivem ao docker compose down
+#    ports:          # Porta exposta só para acesso local (DBeaver, pgAdmin...).
+#      - "5432:5432" # Em produção na AWS, REMOVA esta porta e acesse só pela rede interna.
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d db_pagamentos"]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 10
+#    networks:
+#      - carteira-digital-net
+#
+#volumes:
+#  pgdata:
+#
+#networks:
+#  carteira-digital-net:
+#    driver: bridge

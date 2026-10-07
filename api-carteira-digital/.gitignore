@@ -40,3 +40,4 @@ build/
 5-fluxo-projeto.md
 json.json
 logs
+.env
