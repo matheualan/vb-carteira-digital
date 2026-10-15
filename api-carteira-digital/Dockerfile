@@ -31,7 +31,7 @@ RUN java -Djarmode=tools -jar target/*.jar extract \
 FROM eclipse-temurin:21-jre-alpine
 
 # Recebe as flags de JVM por variavel de ambiente, o que mantem
-# o ENTRYPOINT em forma exec (sem shell, sinalIZACAO correta no docker stop).
+# o ENTRYPOINT em forma exec (sem shell, sinalizacao correta no docker stop).
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/urandom -Dfile.encoding=UTF-8"
 
 # Fixa a porta em 8080 dentro do container. SERVER_PORT tem precedencia sobre
